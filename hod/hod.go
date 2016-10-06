@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/hpcloud/hsm/src/common"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -52,7 +53,9 @@ type Vcap struct {
 	HodKey string
 }
 
-func getVcapServices() string {
+var hodServiceInfo Service
+
+func setHodVcapServices() {
 	vcap := os.Getenv("VCAP_SERVICES")
 	if vcap == "" {
 		t := template.New("hello template")
@@ -60,9 +63,12 @@ func getVcapServices() string {
 		v := Vcap{HodKey: os.Getenv("HODKEY")}
 		var doc bytes.Buffer
 		t.Execute(&doc, v)
-		return doc.String()
+		vcap = doc.String()
 	}
-	return vcap
+	if err := json.Unmarshal([]byte(vcap), &hodServiceInfo); err != nil {
+		common.Logger.Error(err)
+	}
+	return
 }
 
 // Info handler to get coordinate details from havenondemand
@@ -71,13 +77,8 @@ func Info(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		Latitude: ps.ByName("lat"),
 		Longitue: ps.ByName("lng"),
 	}
-	vcap := getVcapServices()
-	var srv Service
-	if err := json.Unmarshal([]byte(vcap), &srv); err != nil {
-		fmt.Fprintln(w, err)
-		return
-	}
-	hodAPIKey := srv.HOD[0].Creds.APIKey
+	setHodVcapServices()
+	hodAPIKey := hodServiceInfo.HOD[0].Creds.APIKey
 	location := "&lat=" + coord.Latitude + "&lon=" + coord.Longitue + "&"
 	hodurl := "https://api.havenondemand.com/1/api/sync/mapcoordinates/v1?apikey=" + hodAPIKey + location + "targets=country&targets=timezone&targets=zipcode_us"
 	resp, err := http.Get(hodurl)

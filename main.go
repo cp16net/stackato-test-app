@@ -4,12 +4,12 @@ package main
 
 import (
 	"html/template"
-	"log"
 	"net/http"
 
 	"github.com/cp16net/hod-test-app/common"
 	"github.com/cp16net/hod-test-app/hod"
 	"github.com/julienschmidt/httprouter"
+	"github.com/tylerb/graceful"
 )
 
 // Templates with functions available to them
@@ -20,7 +20,7 @@ func init() {
 	for _, path := range AssetNames() {
 		bytes, err := Asset(path)
 		if err != nil {
-			log.Panicf("Unable to parse: path=%s, err=%s", path, err)
+			common.Logger.Panicf("Unable to parse: path=%s, err=%s", path, err)
 		}
 		templates.New(path).Parse(string(bytes))
 	}
@@ -54,6 +54,16 @@ func main() {
 
 	common.Logger.Info("Setup routes")
 	// Serve this program forever
-	log.Fatal(http.ListenAndServe(":8888", router))
+	httpServer := &graceful.Server{Server: new(http.Server)}
+	httpServer.Addr = ":8888"
+	httpServer.Handler = router
 	common.Logger.Info("Serving ...")
+	if err := httpServer.ListenAndServe(); err != nil {
+		shutdown(err)
+	}
+}
+
+// shutdown closes down the api server
+func shutdown(err error) {
+	common.Logger.Fatalln(err)
 }
