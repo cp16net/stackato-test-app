@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/hpcloud/hsm/src/common"
+	"github.com/cp16net/hod-test-app/common"
 	"github.com/julienschmidt/httprouter"
 )
 
