@@ -19,12 +19,17 @@ type Coordinate struct {
 	Longitue string `json:"lng"`
 }
 
+// Service Definition
 type Service struct {
 	HOD []HavenOnDemand `json:"hod10"`
 }
+
+// HavenOnDemand Service Info
 type HavenOnDemand struct {
 	Creds Credentials `json:"credentials"`
 }
+
+// Credentials for HavenOnDemand
 type Credentials struct {
 	APIKey string `json:"HOD_API_KEY"`
 }
@@ -49,6 +54,7 @@ var envVcapServices = `
 	]
 }`
 
+// Vcap type to store VCAP_SERVICES
 type Vcap struct {
 	HodKey string
 }

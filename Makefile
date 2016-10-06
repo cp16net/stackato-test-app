@@ -8,4 +8,4 @@ build:
 	godep go build
 
 run: 
-	./hod-test-app
+	PORT=8888 ./hod-test-app

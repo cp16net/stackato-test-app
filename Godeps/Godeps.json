@@ -13,6 +13,11 @@
 			"Rev": "9a6736ed45b44bf3835afeebb3034b57ed329f3e"
 		},
 		{
+			"ImportPath": "github.com/jessevdk/go-flags",
+			"Comment": "v1-334-g6b9493b",
+			"Rev": "6b9493b3cb60367edd942144879646604089e3f7"
+		},
+		{
 			"ImportPath": "github.com/julienschmidt/httprouter",
 			"Comment": "v1.1-34-gd8ff598",
 			"Rev": "d8ff598a019f2c7bad0980917a588193cf26666e"
