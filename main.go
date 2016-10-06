@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/cp16net/hod-test-app/hod"
+	"github.com/hpcloud/hsm/src/common"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -40,6 +41,7 @@ func hodIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 // The server itself
 func main() {
+	common.Logger.Info("Starting up web application")
 	// mux handler
 	router := httprouter.New()
 
@@ -50,6 +52,8 @@ func main() {
 	// Serve static assets via the "static" directory
 	router.ServeFiles("/static/*filepath", assetFS())
 
+	common.Logger.Info("Setup routes")
 	// Serve this program forever
 	log.Fatal(http.ListenAndServe(":8888", router))
+	common.Logger.Info("Serving ...")
 }

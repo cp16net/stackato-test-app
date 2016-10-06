@@ -1,10 +1,11 @@
 applications:
 - name: hod-test-app
-  buildpack: https://github.com/cloudfoundry/go-buildpack#v1.3.1
+  buildpack: https://github.com/cloudfoundry/go-buildpack
   memory: 32M
   stackato:
     env:
       GOVERSION:
         default: 1.6.2
+      GO15VENDOREXPERIMENT: 0
     ignores:
     - .git
