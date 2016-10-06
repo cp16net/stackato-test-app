@@ -20,10 +20,11 @@
     }
 
     function hodInformation(pos) {
-      lat = pos.lat()
-      lng = pos.lng()
+      if (!pos) {
+        document.getElementById('hod').innerHTML = 'Waiting For New Point'
+      }
       $.get(
-        "/hodinfo/" + lat + "/" + lng,
+        "/hodinfo/" + pos.lat() + "/" + pos.lng(),
         function(data) {
           if (data.matches.length == 0) {
             document.getElementById('hod').innerHTML = 'No data Found';
@@ -76,6 +77,7 @@
       // Add dragging event listeners.
       google.maps.event.addListener(marker, 'dragstart', function() {
         updateMarkerAddress('Dragging...');
+        hodInformation(null);
       });
 
       google.maps.event.addListener(marker, 'drag', function() {
@@ -122,7 +124,7 @@
     <b>Closest matching address:</b>
     <div id="address"></div>
     <b>HOD Information:</b>
-    <div id="hod"></div>
+    <div id="hod">Loading...</div>
   </div>
 </body>
 
