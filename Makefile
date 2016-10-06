@@ -2,10 +2,10 @@ default: all
 all: generate build run
 
 generate:
-	go generate
+	godep go generate
 
 build:
-	go build
+	godep go build
 
 run: 
 	./hod-test-app

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -32,7 +33,7 @@ var envVcapServices = `
 	"hod10": [
 		{
 			"credentials": {
-				"HOD_API_KEY": "test-key"
+				"HOD_API_KEY": "{{.HodKey}}"
 			},
 			"syslog_drain_url": null,
 			"volume_mounts": [],
@@ -47,10 +48,19 @@ var envVcapServices = `
 	]
 }`
 
+type Vcap struct {
+	HodKey string
+}
+
 func getVcapServices() string {
 	vcap := os.Getenv("VCAP_SERVICES")
 	if vcap == "" {
-		return envVcapServices
+		t := template.New("hello template")
+		t, _ = t.Parse(envVcapServices)
+		v := Vcap{HodKey: os.Getenv("HODKEY")}
+		var doc bytes.Buffer
+		t.Execute(&doc, v)
+		return doc.String()
 	}
 	return vcap
 }
