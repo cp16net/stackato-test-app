@@ -9,3 +9,6 @@ applications:
       GO15VENDOREXPERIMENT: 0
     ignores:
     - .git
+  services:
+  - cp16net-mysql
+  - cp16net-hod

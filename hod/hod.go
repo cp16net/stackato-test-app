@@ -21,7 +21,7 @@ type Coordinate struct {
 
 // Service Definition
 type Service struct {
-	HOD []HavenOnDemand `json:"hod"`
+	HOD []HavenOnDemand `json:"cp16net-hod"`
 }
 
 // HavenOnDemand Service Info
@@ -36,7 +36,7 @@ type Credentials struct {
 
 var envVcapServices = `
 {
-	"hod": [
+	"cp16net-hod": [
 		{
 			"credentials": {
 				"HOD_API_KEY": "{{.HodKey}}"

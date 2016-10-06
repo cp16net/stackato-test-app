@@ -5,18 +5,33 @@
 </head>
 
 <body>
+
   <div>
     View of mysql data
   </div>
-  <table>
+
+  <div>
+    <a href="mysql/generate">Generate Data</a>
+  </div>
+
+  Count of users: {{len .}}
+  <table border="1">
+    <tr>
+      <th>Username</th>
+      <th>Email</th>
+      <th>Password</th>
+      <th>CreatedAt</th>
+    </tr>
     {{range .}}
     <tr>
       <td>{{.Username}}</td>
-      <td>{{range .Emails}} {{.Email}} {{end}}</td>
+      <td>{{.Email}}</td>
       <td>{{.Password}}</td>
+      <td>{{.CreatedAt}}</td>
     </tr>
     {{end}}
   </table>
+
 </body>
 
 </html>

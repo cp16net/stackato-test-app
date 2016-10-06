@@ -4,20 +4,20 @@ import (
 	"crypto/rand"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"math/big"
-	"net/http"
 	"os"
 
 	"github.com/cp16net/hod-test-app/common"
 	"github.com/cp16net/hod-test-app/mysql/models"
 	"github.com/jinzhu/gorm"
-	"github.com/julienschmidt/httprouter"
+
+	// _ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 // Service Definition
 type Service struct {
-	Service []Mysql `json:"mysql"`
+	Service []Mysql `json:"cp16net-mysql"`
 }
 
 // Mysql Service Info
@@ -38,7 +38,7 @@ type Credentials struct {
 
 var envVcapServices = `
 {
-	"mysql": [
+	"cp16net-mysql": [
 		{
 			"credentials": {
 				"database": "d78289ac53d224a06beb99fe67775c876",
@@ -82,10 +82,22 @@ func setMysqlVcapServices() {
 }
 
 func dbConnection() *gorm.DB {
-	db, err := gorm.Open("sqlite3", "test.db")
+	if os.Getenv("VCAP_SERVICES") == "" {
+		common.Logger.Debug("RUNNING IN LOCAL MODE WITH SQLITE3")
+		db, err := gorm.Open("sqlite3", "db_test.sqlt")
+		if err != nil {
+			panic("failed to connect database")
+		}
+		db.LogMode(true)
+		return db
+	}
+	common.Logger.Debug("RUNNING IN CF MODE WITH MYSQL")
+	connectionString := mysql.User + ":" + mysql.Password + "@" + mysql.Host + ":" + mysql.Port + "/" + mysql.Database
+	db, err := gorm.Open("mysql", connectionString+"?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 		panic("failed to connect database")
 	}
+	db.LogMode(true)
 	return db
 }
 
@@ -99,31 +111,30 @@ func init() {
 
 	// Migrate the schema
 	db.AutoMigrate(&models.User{})
-	db.AutoMigrate(&models.Email{})
 }
 
 func generateString(length int, characters string) (string, error) {
 	b := make([]byte, length)
-
 	max := big.NewInt(int64(len(characters)))
-
 	for i := range b {
 		var c byte
 		rint, err := rand.Int(rand.Reader, max)
 		if err != nil {
+			common.Logger.Error(err)
 			return "", errors.New("Unable to generate a string. Error : " + err.Error())
 		}
 		c = characters[rint.Int64()]
 		b[i] = c
 	}
+	common.Logger.Debug("generated string: ", string(b))
 	return string(b), nil
 }
 
 const usercharacters = "abcdefghijklmnopqrstuvwxyz"
-const passwordcharacters = `abcdefghijklmnopqrstuvwxyz1234567890-=[]\;',./~!@#$%&^*()_+{}|:\"<>?`
+const passwordcharacters = `abcdefghijklmnopqrstuvwxyz1234567890`
 
-// CreateData generates a random user
-func CreateData(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+// GenerateUser generates a random user
+func GenerateUser() models.User {
 	db := dbConnection()
 	defer closeConnection(db)
 	username, err := generateString(10, usercharacters)
@@ -134,23 +145,27 @@ func CreateData(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if err != nil {
 		common.Logger.Error("Error generating a password", err)
 	}
-	db.Create(&models.User{
+	var user = models.User{
 		Username: username,
 		Password: password,
-		Emails: []models.Email{
-			{Email: username + "@gmail.com"},
-		},
-	})
+		Email:    username + "@gmail.com",
+	}
+	common.Logger.Debug("Creating User: ", user)
+	common.Logger.Debug("has user been created?: ", db.NewRecord(user))
+	db.Create(&user)
+	common.Logger.Debug("has user been created?: ", db.NewRecord(user))
+	return user
 }
 
-// Test handler to get coordinate details from havenondemand
-func Test(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+// Users handler to get coordinate details from havenondemand
+func Users() []models.User {
 
 	db := dbConnection()
 	defer closeConnection(db)
 
 	var users []models.User
 	db.Find(&users)
+	common.Logger.Debug("found users: ", users)
 
-	fmt.Fprintln(w, "this is going to be testing mysql")
+	return users
 }

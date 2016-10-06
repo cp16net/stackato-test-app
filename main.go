@@ -62,7 +62,6 @@ func renderTemplate(w http.ResponseWriter, tmpl string, p interface{}) {
 
 func hodIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	renderTemplate(w, "templates/hod.html", nil)
-
 }
 
 func envHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -71,6 +70,16 @@ func envHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 func mainHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	renderTemplate(w, "templates/main.html", nil)
+}
+
+func mysqlHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	data := mysql.Users()
+	renderTemplate(w, "templates/mysql.html", data)
+}
+
+func mysqlCreateUserHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	mysql.GenerateUser()
+	http.Redirect(w, r, "/mysql", 302)
 }
 
 // The server itself
@@ -86,8 +95,8 @@ func main() {
 	router.GET("/hod", hodIndex)
 	router.GET("/hodinfo/:lat/:lng", hod.Info)
 
-	router.GET("/testmysql", mysql.Test)
-	router.GET("/testmysql/generate", mysql.CreateData)
+	router.GET("/mysql", mysqlHandler)
+	router.GET("/mysql/generate", mysqlCreateUserHandler)
 
 	// Serve static assets via the "static" directory
 	router.ServeFiles("/static/*filepath", assetFS())
