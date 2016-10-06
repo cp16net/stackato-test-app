@@ -111,11 +111,11 @@ func closeConnection(db *gorm.DB) {
 }
 
 func init() {
-	db := dbConnection()
-	defer closeConnection(db)
+	// db := dbConnection()
+	// defer closeConnection(db)
 
-	// Migrate the schema
-	db.AutoMigrate(&models.User{})
+	// // Migrate the schema
+	// db.AutoMigrate(&models.User{})
 }
 
 func generateString(length int, characters string) (string, error) {
