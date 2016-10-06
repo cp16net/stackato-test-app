@@ -3,13 +3,16 @@ package main
 //go:generate go-bindata-assetfs static/... templates/...
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/cp16net/hod-test-app/common"
 	"github.com/cp16net/hod-test-app/hod"
+	"github.com/cp16net/hod-test-app/mysql"
 	"github.com/jessevdk/go-flags"
 	"github.com/julienschmidt/httprouter"
 	"github.com/tylerb/graceful"
@@ -62,6 +65,10 @@ func hodIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 }
 
+func envHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	fmt.Fprintln(w, strings.Join(os.Environ(), "\n"))
+}
+
 func mainHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	renderTemplate(w, "templates/main.html", nil)
 }
@@ -73,9 +80,14 @@ func main() {
 	router := httprouter.New()
 	router.GET("/", mainHandler)
 
+	router.GET("/env", envHandler)
+
 	// Routes for hod page and api
 	router.GET("/hod", hodIndex)
 	router.GET("/hodinfo/:lat/:lng", hod.Info)
+
+	router.GET("/testmysql", mysql.Test)
+	router.GET("/testmysql/generate", mysql.CreateData)
 
 	// Serve static assets via the "static" directory
 	router.ServeFiles("/static/*filepath", assetFS())

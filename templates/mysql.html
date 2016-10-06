@@ -1,0 +1,22 @@
+<html>
+
+<head>
+  <title>mysql view</title>
+</head>
+
+<body>
+  <div>
+    View of mysql data
+  </div>
+  <table>
+    {{range .}}
+    <tr>
+      <td>{{.Username}}</td>
+      <td>{{range .Emails}} {{.Email}} {{end}}</td>
+      <td>{{.Password}}</td>
+    </tr>
+    {{end}}
+  </table>
+</body>
+
+</html>
