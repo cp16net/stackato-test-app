@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/jmcfarlane/golang-templates-example/hod"
+	"github.com/cp16net/hod-test-app/hod"
 	"github.com/julienschmidt/httprouter"
 )
 
