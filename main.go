@@ -7,8 +7,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/cp16net/hod-test-app/common"
 	"github.com/cp16net/hod-test-app/hod"
-	"github.com/hpcloud/hsm/src/common"
 	"github.com/julienschmidt/httprouter"
 )
 
