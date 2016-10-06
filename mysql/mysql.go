@@ -75,9 +75,11 @@ func setMysqlVcapServices() {
 		// vcap = doc.String()
 		vcap = envVcapServices
 	}
-	if err := json.Unmarshal([]byte(vcap), &mysql); err != nil {
+	var svc Service
+	if err := json.Unmarshal([]byte(vcap), &svc); err != nil {
 		common.Logger.Error(err)
 	}
+	mysql = svc.Service[0].Creds
 	return
 }
 
@@ -92,8 +94,11 @@ func dbConnection() *gorm.DB {
 		return db
 	}
 	common.Logger.Debug("RUNNING IN CF MODE WITH MYSQL")
-	connectionString := mysql.User + ":" + mysql.Password + "@" + mysql.Host + ":" + mysql.Port + "/" + mysql.Database
-	db, err := gorm.Open("mysql", connectionString+"?charset=utf8&parseTime=True&loc=Local")
+	setMysqlVcapServices()
+	// connectionString := "'" + mysql.User + "'" + ":" + "'" + mysql.Password + "'" + "@" + mysql.Host + ":" + mysql.Port + "/" + mysql.Database
+	connectionString := mysql.User + ":" + mysql.Password + "@tcp(" + mysql.Host + ":" + mysql.Port + ")/" + mysql.Database
+	common.Logger.Debug("mysql connection string: ", connectionString)
+	db, err := gorm.Open("mysql", connectionString+"?charset=utf8&parseTime=True")
 	if err != nil {
 		panic("failed to connect database")
 	}
