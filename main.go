@@ -86,6 +86,10 @@ func main() {
 	if err := httpServer.ListenAndServe(); err != nil {
 		shutdown(err)
 	}
+
+	go func() {
+		<-httpServer.StopChan()
+	}()
 }
 
 // shutdown closes down the api server

@@ -22,6 +22,7 @@
     function hodInformation(pos) {
       if (!pos) {
         document.getElementById('hod').innerHTML = 'Waiting For New Point'
+        return
       }
       $.get(
         "/hodinfo/" + pos.lat() + "/" + pos.lng(),
