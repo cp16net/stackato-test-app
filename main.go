@@ -62,11 +62,16 @@ func hodIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 }
 
+func mainHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	renderTemplate(w, "templates/main.html", nil)
+}
+
 // The server itself
 func main() {
 	common.Logger.Info("Starting up web application")
 	// mux handler
 	router := httprouter.New()
+	router.GET("/", mainHandler)
 
 	// Routes for hod page and api
 	router.GET("/hod", hodIndex)
