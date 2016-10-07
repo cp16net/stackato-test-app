@@ -53,6 +53,45 @@
 		{
 			"ImportPath": "golang.org/x/sys/unix",
 			"Rev": "8d1157a435470616f975ff9bb013bea8d0962067"
+		},
+		{
+			"ImportPath": "gopkg.in/bsm/ratelimit.v1",
+			"Rev": "db14e161995a5177acef654cb0dd785e8ee8bc22"
+		},
+		{
+			"ImportPath": "gopkg.in/redis.v4",
+			"Comment": "v4.2.1",
+			"Rev": "5a272d03b960a72c61e5025a7d6e8da5d8815442"
+		},
+		{
+			"ImportPath": "gopkg.in/redis.v4/internal",
+			"Comment": "v4.2.1",
+			"Rev": "5a272d03b960a72c61e5025a7d6e8da5d8815442"
+		},
+		{
+			"ImportPath": "gopkg.in/redis.v4/internal/consistenthash",
+			"Comment": "v4.2.1",
+			"Rev": "5a272d03b960a72c61e5025a7d6e8da5d8815442"
+		},
+		{
+			"ImportPath": "gopkg.in/redis.v4/internal/errors",
+			"Comment": "v4.2.1",
+			"Rev": "5a272d03b960a72c61e5025a7d6e8da5d8815442"
+		},
+		{
+			"ImportPath": "gopkg.in/redis.v4/internal/hashtag",
+			"Comment": "v4.2.1",
+			"Rev": "5a272d03b960a72c61e5025a7d6e8da5d8815442"
+		},
+		{
+			"ImportPath": "gopkg.in/redis.v4/internal/pool",
+			"Comment": "v4.2.1",
+			"Rev": "5a272d03b960a72c61e5025a7d6e8da5d8815442"
+		},
+		{
+			"ImportPath": "gopkg.in/redis.v4/internal/proto",
+			"Comment": "v4.2.1",
+			"Rev": "5a272d03b960a72c61e5025a7d6e8da5d8815442"
 		}
 	]
 }

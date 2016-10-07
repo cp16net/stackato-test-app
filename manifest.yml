@@ -9,11 +9,8 @@ applications:
       GO15VENDOREXPERIMENT: 0
     ignores:
     - .git
-    # hooks:
-      # post-staging:
-      # setting up in filesystem
-      # - sh mysql-setup.sh
   services:
   - cp16net-mysql
   - cp16net-hod
   - cp16net-googleapi
+  - cp16net-redis

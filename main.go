@@ -14,6 +14,7 @@ import (
 	"github.com/cp16net/hod-test-app/common"
 	"github.com/cp16net/hod-test-app/hod"
 	"github.com/cp16net/hod-test-app/mysql"
+	"github.com/cp16net/hod-test-app/redis"
 	"github.com/jessevdk/go-flags"
 	"github.com/julienschmidt/httprouter"
 	"github.com/tylerb/graceful"
@@ -103,10 +104,6 @@ func setGoogleVcapServices() {
 		common.Logger.Error(err)
 		panic("could not read vcap")
 	}
-	common.Logger.Debug(vcap)
-	common.Logger.Debug(svc)
-	common.Logger.Debug(svc.Service[0])
-	common.Logger.Debug(svc.Service[0].Creds)
 	creds = svc.Service[0].Creds
 	return
 }
@@ -138,6 +135,16 @@ func mysqlCreateUserHandler(w http.ResponseWriter, r *http.Request, ps httproute
 	http.Redirect(w, r, "/mysql", 302)
 }
 
+func redisHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	data := redis.GetCount()
+	renderTemplate(w, "templates/redis.html", data)
+}
+
+func redisIncrementHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	redis.Increment()
+	http.Redirect(w, r, "/redis", 302)
+}
+
 // The server itself
 func main() {
 	common.Logger.Info("Starting up web application")
@@ -153,6 +160,9 @@ func main() {
 
 	router.GET("/mysql", mysqlHandler)
 	router.GET("/mysql/generate", mysqlCreateUserHandler)
+
+	router.GET("/redis", redisHandler)
+	router.GET("/redis/increment", redisIncrementHandler)
 
 	// Serve static assets via the "static" directory
 	router.ServeFiles("/static/*filepath", assetFS())
