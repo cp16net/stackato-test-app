@@ -11,8 +11,7 @@ import (
 	"github.com/cp16net/hod-test-app/mysql/models"
 	"github.com/jinzhu/gorm"
 
-	// _ "github.com/jinzhu/gorm/dialects/mysql"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 // Service Definition
@@ -41,13 +40,13 @@ var envVcapServices = `
 	"cp16net-mysql": [
 		{
 			"credentials": {
-				"database": "d78289ac53d224a06beb99fe67775c876",
-                "host": "mysql-int.mysql.svc",
-                "hostname": "mysql-int.mysql.svc",
-                "password": "ckm7DURqexO_hdvFCSqGLqmlojua-uBcY6JAXS0ogzY",
+				"database": "appdb",
+                "host": "localhost",
+                "hostname": "localhost",
+                "password": "password",
                 "port": "3306",
-                "user": "58780af232f16243",
-                "username": "58780af232f16243"
+                "user": "cp16net",
+                "username": "cp16net"
 			},
 			"syslog_drain_url": null,
 			"volume_mounts": [],
@@ -67,38 +66,24 @@ var mysql Credentials
 func setMysqlVcapServices() {
 	vcap := os.Getenv("VCAP_SERVICES")
 	if vcap == "" {
-		// t := template.New("hello template")
-		// t, _ = t.Parse(envVcapServices)
-		// v := Vcap{HodKey: os.Getenv("HODKEY")}
-		// var doc bytes.Buffer
-		// t.Execute(&doc, v)
-		// vcap = doc.String()
 		vcap = envVcapServices
 	}
 	var svc Service
 	if err := json.Unmarshal([]byte(vcap), &svc); err != nil {
 		common.Logger.Error(err)
+		panic("could not read vcap")
 	}
 	mysql = svc.Service[0].Creds
 	return
 }
 
 func dbConnection() *gorm.DB {
-	if os.Getenv("VCAP_SERVICES") == "" {
-		common.Logger.Debug("RUNNING IN LOCAL MODE WITH SQLITE3")
-		db, err := gorm.Open("sqlite3", "db_test.sqlt")
-		if err != nil {
-			panic("failed to connect database")
-		}
-		db.LogMode(true)
-		return db
-	}
 	common.Logger.Debug("RUNNING IN CF MODE WITH MYSQL")
 	setMysqlVcapServices()
-	// connectionString := "'" + mysql.User + "'" + ":" + "'" + mysql.Password + "'" + "@" + mysql.Host + ":" + mysql.Port + "/" + mysql.Database
-	connectionString := mysql.User + ":" + mysql.Password + "@tcp(" + mysql.Host + ":" + mysql.Port + ")/" + mysql.Database
-	common.Logger.Debug("mysql connection string: ", connectionString)
-	db, err := gorm.Open("mysql", connectionString+"?charset=utf8&parseTime=True")
+	connectionString := mysql.User + ":" + mysql.Password
+	connectionString += "@tcp(" + mysql.Host + ":" + mysql.Port + ")"
+	connectionString += "/" + mysql.Database + "?charset=utf8&parseTime=True"
+	db, err := gorm.Open("mysql", connectionString)
 	if err != nil {
 		panic("failed to connect database")
 	}
@@ -111,11 +96,11 @@ func closeConnection(db *gorm.DB) {
 }
 
 func init() {
-	// db := dbConnection()
-	// defer closeConnection(db)
+	db := dbConnection()
+	defer closeConnection(db)
 
-	// // Migrate the schema
-	// db.AutoMigrate(&models.User{})
+	// Migrate the schema
+	db.AutoMigrate(&models.User{})
 }
 
 func generateString(length int, characters string) (string, error) {

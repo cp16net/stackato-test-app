@@ -3,6 +3,7 @@ package main
 //go:generate go-bindata-assetfs static/... templates/...
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -42,6 +43,8 @@ func init() {
 		}
 		templates.New(path).Parse(string(bytes))
 	}
+
+	// parse the flags
 	_, err := parser.Parse()
 	if e, ok := err.(*flags.Error); ok {
 		if e.Type == flags.ErrHelp {
@@ -50,6 +53,8 @@ func init() {
 			os.Exit(1) //exit with error for other cases
 		}
 	}
+
+	setGoogleVcapServices()
 }
 
 // Render a template given a model
@@ -60,8 +65,59 @@ func renderTemplate(w http.ResponseWriter, tmpl string, p interface{}) {
 	}
 }
 
+// Service Definition
+type Service struct {
+	Service []Google `json:"cp16net-googleapi"`
+}
+
+// Google Service Info
+type Google struct {
+	Creds Credentials `json:"credentials"`
+}
+
+// Credentials for HavenOnDemand
+type Credentials struct {
+	PassthroughData string `json:"PASSTHROUGH_DATA"`
+}
+
+var envVcapServices = `
+{
+	"cp16net-googleapi": [
+		{
+			"credentials": {
+				"PASSTHROUGH_DATA": "{\"google_api_key\":\"AIzaSyCdRGSQcby_ya2BY-5aViKW0o4pMcHJS-g\"}"
+			}
+		}
+	]
+}`
+
+var creds Credentials
+
+func setGoogleVcapServices() {
+	vcap := os.Getenv("VCAP_SERVICES")
+	if vcap == "" {
+		vcap = envVcapServices
+	}
+	var svc Service
+	if err := json.Unmarshal([]byte(vcap), &svc); err != nil {
+		common.Logger.Error(err)
+		panic("could not read vcap")
+	}
+	common.Logger.Debug(vcap)
+	common.Logger.Debug(svc)
+	common.Logger.Debug(svc.Service[0])
+	common.Logger.Debug(svc.Service[0].Creds)
+	creds = svc.Service[0].Creds
+	return
+}
 func hodIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	renderTemplate(w, "templates/hod.html", nil)
+	var data map[string]string
+	if err := json.Unmarshal([]byte(creds.PassthroughData), &data); err != nil {
+		common.Logger.Error(err)
+		panic("could not read vcap: " + creds.PassthroughData)
+	}
+	key := data["google_api_key"]
+	renderTemplate(w, "templates/hod.html", key)
 }
 
 func envHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
