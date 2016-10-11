@@ -10,11 +10,26 @@
     View of some redis data
   </div>
 
-  Current count: {{.}}
+  Current count: {{.Counter}}
   <div>
     <a href="redis/increment">Increment</a>
   </div>
 
+  Data in DB:
+  <div>
+    <table border="1">
+      <tr>
+        <th>key</th>
+        <th>value</th>
+      </tr>
+      {{range $key, $value := .Data}}
+      <tr>
+        <td>{{ $key }}</td>
+        <td>{{ $value }}</td>
+      </tr>
+      {{end}}
+    </table>
+  </div>
 </body>
 
 </html>

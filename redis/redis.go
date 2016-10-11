@@ -98,3 +98,19 @@ func GetCount() int64 {
 	n, _ := client.Get("counter").Int64()
 	return n
 }
+
+// ListKeys gets the list of all keys in db
+func ListKeys() []string {
+	client := dbConnection()
+	defer closeConnection(client)
+	n := client.Keys("*")
+	return n.Val()
+}
+
+// GetVal gets the value of the key out of the db
+func GetVal(key string) string {
+	client := dbConnection()
+	defer closeConnection(client)
+	n := client.Get(key)
+	return n.Val()
+}

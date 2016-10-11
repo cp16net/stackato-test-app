@@ -135,9 +135,19 @@ func mysqlCreateUserHandler(w http.ResponseWriter, r *http.Request, ps httproute
 	http.Redirect(w, r, "/mysql", 302)
 }
 
+type redisData struct {
+	Counter int64
+	Data    map[string]string
+}
+
 func redisHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	data := redis.GetCount()
-	renderTemplate(w, "templates/redis.html", data)
+	rd := redisData{Data: make(map[string]string)}
+	rd.Counter = redis.GetCount()
+	keys := redis.ListKeys()
+	for _, key := range keys {
+		rd.Data[key] = redis.GetVal(key)
+	}
+	renderTemplate(w, "templates/redis.html", rd)
 }
 
 func redisIncrementHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
