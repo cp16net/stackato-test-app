@@ -1,0 +1,35 @@
+<html>
+
+<head>
+  <title>rabbitmq view</title>
+</head>
+
+<body>
+  <div>
+    Rabbitmq testing
+  </div>
+
+  <br/>
+  <div>
+    <a href="/">Home</a>
+  </div>
+
+  <br/> Fib input: {{.Input}}
+  <br/> Fib output: {{.Output}}
+  <br/>
+
+  <br/> New Fib Test
+  <div>
+    <form action="/rabbitmq/fib" method="POST">
+      <fieldset>
+        <legend>Enter a number for Fib test</legend>
+        Number:
+        <input type="number" name="fib" value="{{if .Input}}{{.Input+1}}{{else}}2{{end}}"><br/>
+        <input type="submit" value="Submit">
+      </fieldset>
+    </form>
+  </div>
+
+</body>
+
+</html>

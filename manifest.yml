@@ -14,3 +14,21 @@ applications:
   - cp16net-hod
   - cp16net-googleapi
   - cp16net-redis
+  - cp16net-rabbitmq
+
+- name: amqp-server
+  buildpack: https://github.com/cloudfoundry/go-buildpack
+  memory: 32M
+  no-route: true
+  health-check-type: none
+  path: amqp-server/
+  timeout: 10
+  stackato:
+    env:
+      GOVERSION:
+        default: 1.6.2
+      GO15VENDOREXPERIMENT: 0
+    ignores:
+    - .git
+  services:
+  - cp16net-rabbitmq

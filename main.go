@@ -14,6 +14,7 @@ import (
 	"github.com/cp16net/hod-test-app/common"
 	"github.com/cp16net/hod-test-app/hod"
 	"github.com/cp16net/hod-test-app/mysql"
+	"github.com/cp16net/hod-test-app/rabbitmq"
 	"github.com/cp16net/hod-test-app/redis"
 	"github.com/jessevdk/go-flags"
 	"github.com/julienschmidt/httprouter"
@@ -158,11 +159,32 @@ func redisIncrementHandler(w http.ResponseWriter, r *http.Request, ps httprouter
 func redisSetHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	key := r.PostFormValue("key")
 	val := r.PostFormValue("value")
-
-	// key := ps.ByName("key")
-	// val := ps.ByName("value")
 	redis.Set(key, val)
 	http.Redirect(w, r, "/redis", 302)
+}
+
+// FibData data for output
+type FibData struct {
+	Input  int
+	Output int
+}
+
+func rabbitmqFibHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	fib := r.PostFormValue("fib")
+	val, err := strconv.Atoi(fib)
+	if err != nil {
+		common.Logger.Error("Posted value is not an integer: " + fib)
+	}
+	out, err := rabbitmq.FibonacciRPC(val)
+	if err != nil {
+		common.Logger.Error("Posted value is not an integer: " + fib)
+	}
+	rd := FibData{Input: val, Output: out}
+	renderTemplate(w, "templates/rabbitmq.html", rd)
+}
+
+func rabbitmqHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	renderTemplate(w, "templates/rabbitmq.html", FibData{})
 }
 
 // The server itself
@@ -184,6 +206,10 @@ func main() {
 	router.GET("/redis", redisHandler)
 	router.GET("/redis/increment", redisIncrementHandler)
 	router.POST("/redis/set", redisSetHandler)
+
+	// rabbitmq test route
+	router.GET("/rabbitmq", rabbitmqHandler)
+	router.POST("/rabbitmq/fib", rabbitmqFibHandler)
 
 	// Serve static assets via the "static" directory
 	router.ServeFiles("/static/*filepath", assetFS())
