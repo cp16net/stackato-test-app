@@ -155,6 +155,16 @@ func redisIncrementHandler(w http.ResponseWriter, r *http.Request, ps httprouter
 	http.Redirect(w, r, "/redis", 302)
 }
 
+func redisSetHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	key := r.PostFormValue("key")
+	val := r.PostFormValue("value")
+
+	// key := ps.ByName("key")
+	// val := ps.ByName("value")
+	redis.Set(key, val)
+	http.Redirect(w, r, "/redis", 302)
+}
+
 // The server itself
 func main() {
 	common.Logger.Info("Starting up web application")
@@ -173,6 +183,7 @@ func main() {
 
 	router.GET("/redis", redisHandler)
 	router.GET("/redis/increment", redisIncrementHandler)
+	router.POST("/redis/set", redisSetHandler)
 
 	// Serve static assets via the "static" directory
 	router.ServeFiles("/static/*filepath", assetFS())
@@ -189,9 +200,9 @@ func main() {
 		shutdown(err)
 	}
 
-	go func() {
-		<-httpServer.StopChan()
-	}()
+	// go func() {
+	// 	<-httpServer.StopChan()
+	// }()
 }
 
 // shutdown closes down the api server

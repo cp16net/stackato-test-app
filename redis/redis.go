@@ -114,3 +114,11 @@ func GetVal(key string) string {
 	n := client.Get(key)
 	return n.Val()
 }
+
+// Set just a simple set method for redis
+func Set(key, value string) error {
+	client := dbConnection()
+	defer closeConnection(client)
+	n := client.Set(key, value, 0)
+	return n.Err()
+}
