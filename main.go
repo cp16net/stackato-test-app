@@ -13,6 +13,7 @@ import (
 
 	"github.com/cp16net/hod-test-app/common"
 	"github.com/cp16net/hod-test-app/hod"
+	"github.com/cp16net/hod-test-app/mongo"
 	"github.com/cp16net/hod-test-app/mysql"
 	"github.com/cp16net/hod-test-app/rabbitmq"
 	"github.com/cp16net/hod-test-app/redis"
@@ -174,11 +175,11 @@ func rabbitmqFibHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	fib := r.PostFormValue("fib")
 	val, err := strconv.Atoi(fib)
 	if err != nil {
-		common.Logger.Error("Posted value is not an integer: " + fib)
+		common.Logger.Error("Posted value is not an integer: ", fib)
 	}
 	out, err := rabbitmq.FibonacciRPC(val)
 	if err != nil {
-		common.Logger.Error("Posted value is not an integer: " + fib)
+		common.Logger.Error("error calling fib on: ", err)
 	}
 	rd := FibData{Input: val, Output: out}
 	renderTemplate(w, "templates/rabbitmq.html", rd)
@@ -186,6 +187,24 @@ func rabbitmqFibHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 
 func rabbitmqHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	renderTemplate(w, "templates/rabbitmq.html", FibData{Input: 1, Output: 0})
+}
+
+func rabbitmqLogHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	logs := r.PostFormValue("logs")
+	if logs == "" {
+		renderTemplate(w, "templates/logs.html", []rabbitmq.Log{})
+	}
+
+	go func() {
+		val, err := strconv.Atoi(logs)
+		if err != nil {
+			common.Logger.Error("Posted value is not an integer: ", logs)
+		}
+		rabbitmq.WriteLogs(val)
+	}()
+
+	result := mongo.GetLogs()
+	renderTemplate(w, "templates/logs.html", result)
 }
 
 // The server itself
@@ -211,6 +230,8 @@ func main() {
 	// rabbitmq test route
 	router.GET("/rabbitmq", rabbitmqHandler)
 	router.POST("/rabbitmq/fib", rabbitmqFibHandler)
+	router.GET("/logs", rabbitmqLogHandler)
+	router.POST("/logs", rabbitmqLogHandler)
 
 	// Serve static assets via the "static" directory
 	router.ServeFiles("/static/*filepath", assetFS())

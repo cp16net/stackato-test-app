@@ -1,0 +1,49 @@
+<html>
+
+<head>
+  <title>logs view</title>
+</head>
+
+<body>
+  <div>
+    Rabbitmq load testing and writing to mongodb
+  </div>
+
+  <br/>
+  <div>
+    <a href="/">Home</a>
+  </div>
+
+  <br/> Rabbit Load Test
+  <div>
+    <form action="/rabbitmq/logs" method="POST">
+      <fieldset>
+        <legend>Enter a number of logs to push to mongodb</legend>
+        Number:
+        <input type="number" name="logs" value="2"><br/>
+        <input type="submit" value="Submit">
+      </fieldset>
+    </form>
+  </div>
+
+  <br/> Data:
+  <div>
+    <table>
+      <tr>
+        <th>#</th>
+        <th>message</th>
+      </tr>
+
+      {{range .}}
+      <tr>
+        <td>{{.Number}}</td>
+        <td>{{.Message}}</td>
+      </tr>
+      {{end}}
+
+    </table>
+  </div>
+
+</body>
+
+</html>

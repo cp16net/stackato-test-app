@@ -30,16 +30,7 @@ func randInt(min int, max int) int {
 
 // FibonacciRPC call to amqp
 func FibonacciRPC(n int) (res int, err error) {
-	appEnv, _ := cfenv.Current()
-	svc, err := appEnv.Services.WithName("cp16net-rabbitmq")
-	if err != nil {
-		panic("failed to get the cp16net-rabbitmq service details")
-	}
-	uri, ok := svc.CredentialString("uri")
-	if !ok {
-		panic("failed to get the credential uri for rabbitmq")
-	}
-	conn, err := amqp.Dial(uri)
+	conn, err := amqp.Dial(amqpuri)
 	// conn, err := amqp.Dial("amqp://user:password@localhost:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
@@ -95,6 +86,61 @@ func FibonacciRPC(n int) (res int, err error) {
 	return
 }
 
+var amqpuri string
+
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
+	appEnv, _ := cfenv.Current()
+	svc, err := appEnv.Services.WithName("cp16net-rabbitmq")
+	if err != nil {
+		panic("failed to get the cp16net-rabbitmq service details")
+	}
+	uri, ok := svc.CredentialString("uri")
+	if !ok {
+		panic("failed to get the credential uri for rabbitmq")
+	}
+	amqpuri = uri
+}
+
+// Log struct for log data
+type Log struct {
+	Message string
+}
+
+// WriteLogs writes number of log messages to amqp to be stored
+func WriteLogs(num int) {
+	conn, err := amqp.Dial(amqpuri)
+	// conn, err := amqp.Dial("amqp://user:password@localhost:5672/")
+	failOnError(err, "Failed to connect to RabbitMQ")
+	defer conn.Close()
+
+	ch, err := conn.Channel()
+	failOnError(err, "Failed to open a channel")
+	defer ch.Close()
+	err = ch.ExchangeDeclare(
+		"logs",   // name
+		"fanout", // type
+		true,     // durable
+		false,    // auto-deleted
+		false,    // internal
+		false,    // no-wait
+		nil,      // arguments
+	)
+	failOnError(err, "Failed to declare an exchange")
+
+	for index := 0; index < num; index++ {
+		message := randomString(64)
+		err = ch.Publish(
+			"logs", // exchange
+			"",     // routing key
+			false,  // mandatory
+			false,  // immediate
+			amqp.Publishing{
+				ContentType: "text/plain",
+				Body:        []byte(message),
+			})
+		failOnError(err, "Failed to publish a message")
+		common.Logger.Infof(" [x] Sent %s", message)
+	}
+
 }

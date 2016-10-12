@@ -17,16 +17,33 @@ applications:
   - cp16net-rabbitmq
   - cp16net-mongo
 
-- name: amqp-server
+- name: fib-server
   buildpack: https://github.com/cloudfoundry/go-buildpack
   memory: 32M
   no-route: true
   health-check-type: none
-  path: amqp-server
+  path: fib-server
   timeout: 10
   stackato:
     env:
-      GOPACKAGENAME: github.com/cp16net/hod-test-app/amqp-server
+      GOPACKAGENAME: github.com/cp16net/hod-test-app/fib-server
+      GOVERSION: 1.6.2
+      GO15VENDOREXPERIMENT: 0
+    ignores:
+    - .git
+  services:
+  - cp16net-rabbitmq
+
+- name: log-server
+  buildpack: https://github.com/cloudfoundry/go-buildpack
+  memory: 32M
+  no-route: true
+  health-check-type: none
+  path: log-server
+  timeout: 10
+  stackato:
+    env:
+      GOPACKAGENAME: github.com/cp16net/hod-test-app/log-server
       GOVERSION: 1.6.2
       GO15VENDOREXPERIMENT: 0
     ignores:
