@@ -63,6 +63,7 @@ func init() {
 func renderTemplate(w http.ResponseWriter, tmpl string, p interface{}) {
 	err := templates.ExecuteTemplate(w, tmpl, p)
 	if err != nil {
+		common.Logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
@@ -184,7 +185,7 @@ func rabbitmqFibHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 }
 
 func rabbitmqHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	renderTemplate(w, "templates/rabbitmq.html", FibData{})
+	renderTemplate(w, "templates/rabbitmq.html", FibData{Input: 1, Output: 0})
 }
 
 // The server itself
@@ -225,10 +226,6 @@ func main() {
 	if err := httpServer.ListenAndServe(); err != nil {
 		shutdown(err)
 	}
-
-	// go func() {
-	// 	<-httpServer.StopChan()
-	// }()
 }
 
 // shutdown closes down the api server
