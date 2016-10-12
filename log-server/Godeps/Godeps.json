@@ -1,0 +1,58 @@
+{
+	"ImportPath": "github.com/cp16net/hod-test-app/log-server",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v74",
+	"Deps": [
+		{
+			"ImportPath": "github.com/Sirupsen/logrus",
+			"Comment": "v0.10.0-38-g3ec0642",
+			"Rev": "3ec0642a7fb6488f65b06f9040adc67e3990296a"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry-community/go-cfenv",
+			"Comment": "v1.14.0-7-gc567d77",
+			"Rev": "c567d77dab8551bc4077e68e5a04415f1d74a911"
+		},
+		{
+			"ImportPath": "github.com/cp16net/hod-test-app/common",
+			"Rev": "63c196592c2cc9aadfb2dd8cb3b33327776aebe2"
+		},
+		{
+			"ImportPath": "github.com/mitchellh/mapstructure",
+			"Rev": "a6ef2f080c66d0a2e94e97cf74f80f772855da63"
+		},
+		{
+			"ImportPath": "github.com/streadway/amqp",
+			"Rev": "2e25825abdbd7752ff08b270d313b93519a0a232"
+		},
+		{
+			"ImportPath": "golang.org/x/sys/unix",
+			"Rev": "8d1157a435470616f975ff9bb013bea8d0962067"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2",
+			"Comment": "r2016.08.01-5-g3f83fa5",
+			"Rev": "3f83fa5005286a7fe593b055f0d7771a7dce4655"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2/bson",
+			"Comment": "r2016.08.01-5-g3f83fa5",
+			"Rev": "3f83fa5005286a7fe593b055f0d7771a7dce4655"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2/internal/json",
+			"Comment": "r2016.08.01-5-g3f83fa5",
+			"Rev": "3f83fa5005286a7fe593b055f0d7771a7dce4655"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2/internal/sasl",
+			"Comment": "r2016.08.01-5-g3f83fa5",
+			"Rev": "3f83fa5005286a7fe593b055f0d7771a7dce4655"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2/internal/scram",
+			"Comment": "r2016.08.01-5-g3f83fa5",
+			"Rev": "3f83fa5005286a7fe593b055f0d7771a7dce4655"
+		}
+	]
+}
