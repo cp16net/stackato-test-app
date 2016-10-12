@@ -15,6 +15,7 @@ applications:
   - cp16net-googleapi
   - cp16net-redis
   - cp16net-rabbitmq
+  - cp16net-mongo
 
 - name: amqp-server
   buildpack: https://github.com/cloudfoundry/go-buildpack
@@ -32,3 +33,4 @@ applications:
     - .git
   services:
   - cp16net-rabbitmq
+  - cp16net-mongo
