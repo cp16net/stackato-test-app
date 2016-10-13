@@ -107,7 +107,7 @@ func main() {
 	forever := make(chan bool)
 	go func() {
 		for d := range msgs {
-			go insertData(c, d.Body)
+			insertData(c, d.Body)
 		}
 	}()
 
@@ -116,7 +116,7 @@ func main() {
 }
 
 func insertData(c *mgo.Collection, data []byte) {
-	common.Logger.Infof(" [x] %s", data)
+	// common.Logger.Infof(" [x] %s", data)
 	err := c.Insert(&Log{string(data)})
 	if err != nil {
 		common.Logger.Fatal(err)
