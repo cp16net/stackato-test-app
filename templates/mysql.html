@@ -17,10 +17,11 @@
 
   <br/>
   <div>
-    <a href="mysql/generate">Generate Data</a>
+    <a href="sql/generate">Generate Data</a>
   </div>
 
-  Count of users: {{len .}}
+  <br/> Mysql Data:
+  <br/> Count of users: {{len .Mysql}}
   <table border="1">
     <tr>
       <th>Username</th>
@@ -28,7 +29,7 @@
       <th>Password</th>
       <th>CreatedAt</th>
     </tr>
-    {{range .}}
+    {{range .Mysql}}
     <tr>
       <td>{{.Username}}</td>
       <td>{{.Email}}</td>
@@ -38,6 +39,25 @@
     {{end}}
   </table>
 
+
+  <br/> Postgres Data:
+  <br/> Count of users: {{len .Postgres}}
+  <table border="1">
+    <tr>
+      <th>Username</th>
+      <th>Email</th>
+      <th>Password</th>
+      <th>CreatedAt</th>
+    </tr>
+    {{range .Postgres}}
+    <tr>
+      <td>{{.Username}}</td>
+      <td>{{.Email}}</td>
+      <td>{{.Password}}</td>
+      <td>{{.CreatedAt}}</td>
+    </tr>
+    {{end}}
+  </table>
 </body>
 
 </html>

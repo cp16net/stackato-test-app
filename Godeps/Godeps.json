@@ -38,6 +38,11 @@
 			"Rev": "ab703afe976d9e7672c2ea2635ef13fdd326583e"
 		},
 		{
+			"ImportPath": "github.com/jinzhu/gorm/dialects/postgres",
+			"Comment": "v1.0-78-gab703af",
+			"Rev": "ab703afe976d9e7672c2ea2635ef13fdd326583e"
+		},
+		{
 			"ImportPath": "github.com/jinzhu/inflection",
 			"Rev": "74387dc39a75e970e7a3ae6a3386b5bd2e5c5cff"
 		},
@@ -45,6 +50,21 @@
 			"ImportPath": "github.com/julienschmidt/httprouter",
 			"Comment": "v1.1-34-gd8ff598",
 			"Rev": "d8ff598a019f2c7bad0980917a588193cf26666e"
+		},
+		{
+			"ImportPath": "github.com/lib/pq",
+			"Comment": "go1.0-cutoff-121-g068cb1c",
+			"Rev": "068cb1c8e4be77b9bdef4d0d91f162160537779e"
+		},
+		{
+			"ImportPath": "github.com/lib/pq/hstore",
+			"Comment": "go1.0-cutoff-121-g068cb1c",
+			"Rev": "068cb1c8e4be77b9bdef4d0d91f162160537779e"
+		},
+		{
+			"ImportPath": "github.com/lib/pq/oid",
+			"Comment": "go1.0-cutoff-121-g068cb1c",
+			"Rev": "068cb1c8e4be77b9bdef4d0d91f162160537779e"
 		},
 		{
 			"ImportPath": "github.com/mitchellh/mapstructure",

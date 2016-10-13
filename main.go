@@ -15,6 +15,8 @@ import (
 	"github.com/cp16net/hod-test-app/hod"
 	"github.com/cp16net/hod-test-app/mongo"
 	"github.com/cp16net/hod-test-app/mysql"
+	"github.com/cp16net/hod-test-app/mysql/models"
+	"github.com/cp16net/hod-test-app/postgres"
 	"github.com/cp16net/hod-test-app/rabbitmq"
 	"github.com/cp16net/hod-test-app/redis"
 	"github.com/jessevdk/go-flags"
@@ -128,14 +130,23 @@ func mainHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	renderTemplate(w, "templates/main.html", nil)
 }
 
+// SQLData for displaying page
+type SQLData struct {
+	Mysql    []models.User
+	Postgres []models.User
+}
+
 func mysqlHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	data := mysql.Users()
+	data := SQLData{}
+	data.Mysql = mysql.Users()
+	data.Postgres = postgres.Users()
 	renderTemplate(w, "templates/mysql.html", data)
 }
 
 func mysqlCreateUserHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	mysql.GenerateUser()
-	http.Redirect(w, r, "/mysql", 302)
+	postgres.GenerateUser()
+	http.Redirect(w, r, "/sql", 302)
 }
 
 type redisData struct {
@@ -218,8 +229,8 @@ func main() {
 	router.GET("/hod", hodIndex)
 	router.GET("/hodinfo/:lat/:lng", hod.Info)
 
-	router.GET("/mysql", mysqlHandler)
-	router.GET("/mysql/generate", mysqlCreateUserHandler)
+	router.GET("/sql", mysqlHandler)
+	router.GET("/sql/generate", mysqlCreateUserHandler)
 
 	router.GET("/redis", redisHandler)
 	router.GET("/redis/increment", redisIncrementHandler)

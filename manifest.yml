@@ -16,6 +16,7 @@ applications:
   - cp16net-redis
   - cp16net-rabbitmq
   - cp16net-mongo
+  - cp16net-postgres
 
 - name: fib-server
   buildpack: https://github.com/cloudfoundry/go-buildpack
