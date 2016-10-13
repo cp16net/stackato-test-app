@@ -196,7 +196,7 @@ func rabbitmqLogHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	if err != nil {
 		common.Logger.Error("Posted value is not an integer: ", logs)
 	}
-	rabbitmq.WriteLogs(val)
+	go rabbitmq.WriteLogs(val)
 	http.Redirect(w, r, "/logs", 302)
 }
 

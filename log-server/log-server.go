@@ -107,14 +107,18 @@ func main() {
 	forever := make(chan bool)
 	go func() {
 		for d := range msgs {
-			common.Logger.Infof(" [x] %s", d.Body)
-			err = c.Insert(&Log{string(d.Body)})
-			if err != nil {
-				common.Logger.Fatal(err)
-			}
+			go insertData(c, d.Body)
 		}
 	}()
 
 	common.Logger.Info(" [*] Waiting for logs...")
 	<-forever
+}
+
+func insertData(c *mgo.Collection, data []byte) {
+	common.Logger.Infof(" [x] %s", data)
+	err := c.Insert(&Log{string(data)})
+	if err != nil {
+		common.Logger.Fatal(err)
+	}
 }
