@@ -7,8 +7,14 @@ import (
 	"gopkg.in/mgo.v2"
 )
 
+// LogData struct for log data
+type LogData struct {
+	Logs  []rabbitmq.Log
+	Count int
+}
+
 // GetLogs returns the list of logs in the db
-func GetLogs() []rabbitmq.Log {
+func GetLogs() LogData {
 	appEnv, _ := cfenv.Current()
 	mongosvc, err := appEnv.Services.WithName("cp16net-mongo")
 	if err != nil {
@@ -18,46 +24,31 @@ func GetLogs() []rabbitmq.Log {
 	if !ok {
 		panic("failed to get the credential uri for mongo")
 	}
-	username, ok := mongosvc.CredentialString("username")
-	if !ok {
-		panic("failed to get the credential username for mongo")
-	}
-	password, ok := mongosvc.CredentialString("password")
-	if !ok {
-		panic("failed to get the credential password for mongo")
-	}
-	host, ok := mongosvc.CredentialString("host")
-	if !ok {
-		panic("failed to get the credential host for mongo")
-	}
-	port, ok := mongosvc.CredentialString("port")
-	if !ok {
-		panic("failed to get the credential port for mongo")
-	}
+
+	// TODO: this is a hack for the mongodb uri
+	// made PR to fix this in csm
+	uri = uri[:len(uri)-1]
+
 	dbname, ok := mongosvc.CredentialString("db")
 	if !ok {
 		panic("failed to get the credential name of db for mongo")
 	}
-	// mongo connection uri should be in the form of:
-	// [mongodb://][user:pass@]host1[:port1][,host2[:port2],...][/database][?options]
-	common.Logger.Debug(uri)
-	// common.Logger.Debug(username)
-	// common.Logger.Debug(password)
-	// common.Logger.Debug(host)
-	// common.Logger.Debug(port)
-	// common.Logger.Debug(dbname)
-	generatedURI := "mongodb://" + username + ":" + password + "@" + host + ":" + port + "/" + dbname
-	common.Logger.Debug(generatedURI)
-	session, err := mgo.Dial(generatedURI)
+	session, err := mgo.Dial(uri)
 	if err != nil {
 		common.Logger.Error("failed to connect to mongo: ", err)
 	}
 	defer session.Close()
 	// session.SetMode(mgo.Monotonic, true)
+	result := LogData{}
 	c := session.DB(dbname).C("gologger")
-	iter := c.Find(nil).Sort("-$natural").Limit(100).Iter()
-	result := []rabbitmq.Log{}
-	err = iter.All(&result)
+	query := c.Find(nil)
+	size, err := query.Count()
+	if err != nil {
+		common.Logger.Error("failed to get count of query from mongo: ", err)
+	}
+	result.Count = size
+	iter := query.Sort("-$natural").Limit(100).Iter()
+	err = iter.All(&result.Logs)
 	if err != nil {
 		common.Logger.Fatal(err)
 	}

@@ -36,7 +36,7 @@ applications:
 
 - name: log-server
   buildpack: https://github.com/cloudfoundry/go-buildpack
-  memory: 32M
+  memory: 512M
   no-route: true
   health-check-type: none
   path: log-server

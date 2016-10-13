@@ -129,7 +129,7 @@ func WriteLogs(num int) {
 	failOnError(err, "Failed to declare an exchange")
 
 	for index := 0; index < num; index++ {
-		message := randomString(64)
+		message := randomString(32)
 		err = ch.Publish(
 			"logs", // exchange
 			"",     // routing key

@@ -97,20 +97,17 @@ func main() {
 	)
 	failOnError(err, "Failed to register a consumer")
 
+	mongoConn, err := mgo.Dial(mongouri)
+	if err != nil {
+		common.Logger.Error("failed to connect to mongo: ", err)
+	}
+	defer mongoConn.Close()
+	c := mongoConn.DB(mongodbname).C("gologger")
+
 	forever := make(chan bool)
 	go func() {
 		for d := range msgs {
-			common.Logger.Info(" [x] %s", d.Body)
-			common.Logger.Debug("mongouri: ", mongouri)
-			// mongo connection uri should be in the form of:
-			// [mongodb://][user:pass@]host1[:port1][,host2[:port2],...][/database][?options]
-			mongoConn, err := mgo.Dial(mongouri)
-			if err != nil {
-				common.Logger.Error("failed to connect to mongo: ", err)
-			}
-			defer mongoConn.Close()
-			// mongoConn.SetMode(mgo.Monotonic, true)
-			c := mongoConn.DB(mongodbname).C("gologger")
+			common.Logger.Infof(" [x] %s", d.Body)
 			err = c.Insert(&Log{string(d.Body)})
 			if err != nil {
 				common.Logger.Fatal(err)

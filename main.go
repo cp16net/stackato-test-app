@@ -10,7 +10,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/cp16net/hod-test-app/common"
 	"github.com/cp16net/hod-test-app/hod"
@@ -192,18 +191,16 @@ func rabbitmqHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 
 func rabbitmqLogHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	logs := r.PostFormValue("logs")
-	if logs == "" {
-		result := mongo.GetLogs()
-		renderTemplate(w, "templates/logs.html", result)
-		return
-	}
 
 	val, err := strconv.Atoi(logs)
 	if err != nil {
 		common.Logger.Error("Posted value is not an integer: ", logs)
 	}
 	rabbitmq.WriteLogs(val)
-	time.Sleep(300 * time.Millisecond)
+	http.Redirect(w, r, "/logs", 302)
+}
+
+func rabbitmqGetLogHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	result := mongo.GetLogs()
 	renderTemplate(w, "templates/logs.html", result)
 }
@@ -233,8 +230,8 @@ func main() {
 	router.POST("/rabbitmq/fib", rabbitmqFibHandler)
 
 	// logger with rabbitmq and mongo
-	router.GET("/logs", rabbitmqLogHandler)
-	router.POST("/logs", rabbitmqLogHandler)
+	router.GET("/logs", rabbitmqGetLogHandler)
+	router.POST("/logs/generate", rabbitmqLogHandler)
 
 	// Serve static assets via the "static" directory
 	router.ServeFiles("/static/*filepath", assetFS())

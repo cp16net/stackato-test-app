@@ -16,7 +16,7 @@
 
   <br/> Rabbit Load Test
   <div>
-    <form action="/logs" method="POST">
+    <form action="/logs/generate" method="POST">
       <fieldset>
         <legend>Enter a number of logs to push to mongodb</legend>
         Number:
@@ -26,16 +26,19 @@
     </form>
   </div>
 
+  <br/> Total records: {{.Count}}
+  <br/>
+
   <br/> Data limted to 100 records:
   <div>
     <table border="1">
       <tr>
-        <th>message</th>
+        <th>message (this is just a random generated string)</th>
       </tr>
 
-      {{range .}}
+      {{range $log := .Logs}}
       <tr>
-        <td>{{.Message}}</td>
+        <td>{{$log}}</td>
       </tr>
       {{end}}
 
