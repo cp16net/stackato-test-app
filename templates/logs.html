@@ -16,7 +16,7 @@
 
   <br/> Rabbit Load Test
   <div>
-    <form action="/rabbitmq/logs" method="POST">
+    <form action="/logs" method="POST">
       <fieldset>
         <legend>Enter a number of logs to push to mongodb</legend>
         Number:
@@ -26,17 +26,15 @@
     </form>
   </div>
 
-  <br/> Data:
+  <br/> Data limted to 100 records:
   <div>
-    <table>
+    <table border="1">
       <tr>
-        <th>#</th>
         <th>message</th>
       </tr>
 
       {{range .}}
       <tr>
-        <td>{{.Number}}</td>
         <td>{{.Message}}</td>
       </tr>
       {{end}}

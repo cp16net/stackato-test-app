@@ -9,13 +9,18 @@ import (
 
 // GetLogs returns the list of logs in the db
 func GetLogs() []rabbitmq.Log {
+	appEnv, _ := cfenv.Current()
+	mongosvc, err := appEnv.Services.WithName("cp16net-mongo")
+	if err != nil {
+		panic("failed to get the cp16net-mongo service details")
+	}
 	uri, ok := mongosvc.CredentialString("uri")
 	if !ok {
 		panic("failed to get the credential uri for mongo")
 	}
-	user, ok := mongosvc.CredentialString("user")
+	username, ok := mongosvc.CredentialString("username")
 	if !ok {
-		panic("failed to get the credential user for mongo")
+		panic("failed to get the credential username for mongo")
 	}
 	password, ok := mongosvc.CredentialString("password")
 	if !ok {
@@ -36,12 +41,12 @@ func GetLogs() []rabbitmq.Log {
 	// mongo connection uri should be in the form of:
 	// [mongodb://][user:pass@]host1[:port1][,host2[:port2],...][/database][?options]
 	common.Logger.Debug(uri)
-	common.Logger.Debug(user)
-	common.Logger.Debug(password)
-	common.Logger.Debug(host)
-	common.Logger.Debug(port)
-	common.Logger.Debug(dbname)
-	generatedURI := "mongodb://" + user + ":" + password + "@" + host + ":" + port
+	// common.Logger.Debug(username)
+	// common.Logger.Debug(password)
+	// common.Logger.Debug(host)
+	// common.Logger.Debug(port)
+	// common.Logger.Debug(dbname)
+	generatedURI := "mongodb://" + username + ":" + password + "@" + host + ":" + port + "/" + dbname
 	common.Logger.Debug(generatedURI)
 	session, err := mgo.Dial(generatedURI)
 	if err != nil {
@@ -49,36 +54,12 @@ func GetLogs() []rabbitmq.Log {
 	}
 	defer session.Close()
 	// session.SetMode(mgo.Monotonic, true)
-	c := session.DB("logs").C("gologger")
+	c := session.DB(dbname).C("gologger")
+	iter := c.Find(nil).Sort("-$natural").Limit(100).Iter()
 	result := []rabbitmq.Log{}
-	err = c.Find(nil).All(&result)
+	err = iter.All(&result)
 	if err != nil {
 		common.Logger.Fatal(err)
 	}
 	return result
-}
-
-var (
-	// mongouri    string
-	// mongodbname string
-	mongosvc *cfenv.Service
-)
-
-func init() {
-	appEnv, _ := cfenv.Current()
-	svc, err := appEnv.Services.WithName("cp16net-mongo")
-	if err != nil {
-		panic("failed to get the cp16net-mongo service details")
-	}
-	mongosvc = svc
-	// uri, ok := svc.CredentialString("uri")
-	// if !ok {
-	// 	panic("failed to get the credential uri for mongo")
-	// }
-	// mongouri = uri
-	// dbname, ok := svc.CredentialString("name")
-	// if !ok {
-	// 	panic("failed to get the credential uri for mongo")
-	// }
-	// mongodbname = dbname
 }

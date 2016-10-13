@@ -31,12 +31,25 @@ func main() {
 	if err != nil {
 		panic("failed to get the cp16net-mongo service details")
 	}
+	mongouri, ok := svcMongo.CredentialString("uri")
+	if !ok {
+		common.Logger.Error("could not get the mongo connection uri string")
+	}
 
-	uri, ok := svcRabbitmq.CredentialString("uri")
+	// TODO: this is a hack for the mongodb uri
+	// made PR to fix this in csm
+	mongouri = mongouri[:len(mongouri)-1]
+
+	mongodbname, ok := svcMongo.CredentialString("db")
+	if !ok {
+		panic("failed to get the credential name of db for mongo")
+	}
+
+	rabbitmquri, ok := svcRabbitmq.CredentialString("uri")
 	if !ok {
 		panic("failed to get the credential uri for rabbitmq")
 	}
-	conn, err := amqp.Dial(uri)
+	conn, err := amqp.Dial(rabbitmquri)
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 
@@ -88,19 +101,16 @@ func main() {
 	go func() {
 		for d := range msgs {
 			common.Logger.Info(" [x] %s", d.Body)
-			uri, ok := svcMongo.CredentialString("uri")
-			if !ok {
-				common.Logger.Error("could not get the mongo connection uri string")
-			}
+			common.Logger.Debug("mongouri: ", mongouri)
 			// mongo connection uri should be in the form of:
 			// [mongodb://][user:pass@]host1[:port1][,host2[:port2],...][/database][?options]
-			mongoConn, err := mgo.Dial(uri)
+			mongoConn, err := mgo.Dial(mongouri)
 			if err != nil {
 				common.Logger.Error("failed to connect to mongo: ", err)
 			}
 			defer mongoConn.Close()
 			// mongoConn.SetMode(mgo.Monotonic, true)
-			c := mongoConn.DB("logs").C("gologger")
+			c := mongoConn.DB(mongodbname).C("gologger")
 			err = c.Insert(&Log{string(d.Body)})
 			if err != nil {
 				common.Logger.Fatal(err)
